@@ -2,25 +2,38 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Interactive Sacred Calendar</title>
   <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+      background: #f4f4f4;
+    }
+
     h2 {
       margin-top: 20px;
       font-size: 30px;
       color: burgundy;
-      margin: 0 0 10px 0;
+      margin-bottom: 10px;
     }
 
-    p {
-      font-size: 18px;
-      color: #555;
+    #calendar-wrapper {
+      max-width: 700px;
+      margin: 0 auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
     }
 
     #calendar table {
-      margin: 0 auto;
       width: 100%;
       table-layout: fixed;
+      border-collapse: collapse;
+      margin: 0 auto;
     }
 
     th {
@@ -29,16 +42,14 @@
       background-color: #eee;
       border: 1px solid #ccc;
       text-align: center;
-      vertical-align: middle;
       font-weight: bold;
     }
 
     td {
       padding: 15px;
       text-align: center;
-      width: 40px;
-      height: 40px;
       border: 1px solid #ccc;
+      height: 40px;
     }
 
     .current-day {
@@ -63,21 +74,11 @@
       color: royalblue;
     }
 
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      margin: 0;
-      padding: 20px;
-      background: #f4f4f4;
-    }
-
-    #calendar-wrapper {
-      max-width: 700px;
-      margin: 0 auto;
-      background: white;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    .legend-title {
+      font-weight: bold;
+      font-size: 16px;
+      margin-top: 20px;
+      margin-bottom: 10px;
     }
 
     #legend-wrapper {
@@ -86,11 +87,10 @@
       border: 2px solid #ddd;
       border-radius: 8px;
       max-width: 600px;
-      margin: 20px auto 0;
+      margin: 0 auto;
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      align-items: center;
       gap: 10px;
     }
 
@@ -102,19 +102,21 @@
       color: #000;
     }
 
-    .legend-title {
-      font-weight: bold;
-      font-size: 16px;
-      margin-bottom: 6px;
-    }
-
+    /* Responsive adjustments */
     @media (max-width: 600px) {
-      #calendar table {
+      th, td {
+        padding: 8px;
         font-size: 12px;
       }
 
-      th, td {
-        padding: 6px;
+      #legend-wrapper {
+        max-width: 100%;
+        gap: 6px;
+      }
+
+      #legend-wrapper span {
+        font-size: 12px;
+        padding: 4px 8px;
       }
     }
   </style>
@@ -126,7 +128,7 @@
 
     <div class="legend-title">Color Legend for Moedim</div>
     <div id="legend-wrapper">
-      <span style="background: #ffeb3b;">Current Day (Highlighted)</span>
+      <span style="background: #ffeb3b;">Current Day</span>
       <span style="background: #ffcc80;">Pesach (Passover)</span>
       <span style="background: #ffe082;">Unleavened Bread</span>
       <span style="background: #fff59d;">First Fruits</span>
@@ -134,7 +136,7 @@
       <span style="background: #81c784;">Yom Teruah</span>
       <span style="background: #ef9a9a;">Yom Kippur</span>
       <span style="background: #ce93d8;">Sukkot</span>
-      <span style="background: #90caf9;">Shabbat</span> <!-- Added Shabbat -->
+      <span style="background: #90caf9;">Shabbat</span>
     </div>
   </div>
 
@@ -164,8 +166,7 @@
     function generateCalendar() {
       const daysInMonth = 28;
       let calendarHTML = `<h2>Month ${currentMonth}</h2>`;
-      calendarHTML += `<table border="1">`;
-      calendarHTML += `<tr><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th><th>Sun</th><th>Mon</th><th>Tue</th></tr>`;
+      calendarHTML += `<table><tr><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th><th>Sun</th><th>Mon</th><th>Tue</th></tr>`;
 
       let day = 1;
       for (let i = 0; i < 4; i++) {
@@ -186,10 +187,7 @@
             }
 
             if(j === 3) className += (className ? " " : "") + "shabbat";
-
-            if(day === currentDayInMonth) {
-              className = "current-day";
-            }
+            if(day === currentDayInMonth) className = "current-day";
 
             calendarHTML += `<td class="${className.trim()}">${day}</td>`;
             day++;
