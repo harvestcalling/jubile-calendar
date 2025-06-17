@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Interactive Sacred Calendar</title>
+  <style>
+    /* Title styles */
+    h2 {
+      margin-top: 20px;
+      font-size: 30px;
+      color: burgundy; /* Set header text color to burgundy */
+      margin: 0 0 10px 0;
+    }
+
+    /* Subtitle styles */
+    p {
+      font-size: 18px;
+      color: #555;
+    }
+
+#calendar table {
+  margin: 0 auto;
+}
+
+
+    /* Center and style table headers */
+    th {
+      padding: 15px;
+      font-size: 18px;
+      background-color: #eee;
+      border: 1px solid #ccc;
+      text-align: center;
+      vertical-align: middle;
+      font-weight: bold;
+    }
+
+    /* Table cell padding */
+    td {
+      padding: 15px;
+      text-align: center;
+      width: 40px;
+      height: 40px;
+      border: 1px solid #ccc;
+    }
+
+    /* Highlight current day */
+    .current-day {
+      background-color: #ffeb3b !important; /* bright yellow */
+      font-weight: bold;
+    }
+
+    /* Highlight moedim (festivals) */
+    td.pesach {
+      background-color: #ffcc80;
+    }
+    td.unleavened {
+      background-color: #ffe082;
+    }
+    td.shavuot {
+      background-color: #ff7043;
+    }
+    td.firstFruits {
+      background-color: #fff59d;
+    }  
+
+    /* Added missing classes for other moedim and Shabbat */
+    td.yomteruah {
+      background-color: #81c784; /* green */
+    }
+    td.yomkippur {
+      background-color: #ef9a9a; /* light red */
+    }
+    td.sukkot {
+      background-color: #ce93d8; /* purple */
+    }
+    td.sukkot8th {
+      background-color: #ba68c8; /* darker purple */
+    }
+    td.shabbat {
+      background-color: #90caf9; /* light blue */
+    }
+
+    /* Month title color */
+    #calendar h2 {
+      margin-top: 0;
+      margin-bottom: 10px;
+      font-size: 24px;
+      color: royalblue; /* Set month title color to royal blue */
+    }
+
+    /* Wrapper styles */
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+      background: #f4f4f4;
+    }
+
+    #calendar-wrapper {
+      max-width: 700px;
+      margin: 0 auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    }
+
+    /* Legend Styles */
+    #legend-wrapper {
+      background: #fff;
+      padding: 10px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      max-width: 600px;
+      margin: 20px auto 0;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+    }
+
+    #legend-wrapper span {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 14px;
+      color: #000;
+    }
+
+    .legend-title {
+      font-weight: bold;
+      font-size: 16px;
+      margin-bottom: 6px;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 600px) {
+      th, td {
+        padding: 10px;
+        width: 30px;
+        height: 30px;
+        font-size: 14px;
+      }
+
+      #legend-wrapper {
+        max-width: 100%;
+        gap: 6px;
+      }
+
+      #legend-wrapper span {
+        font-size: 12px;
+        padding: 4px 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="calendar-wrapper">
+    <h2>Interactive Sacred Calendar</h2>
+    <div id="calendar"></div>
+
+    <div class="legend-title">Color Legend for Moedim</div>
+    <div id="legend-wrapper">
+      <span style="background: #ffeb3b;">Current Day (Highlighted)</span>
+      <span style="background: #ffcc80;">Pesach (Passover)</span>
+      <span style="background: #ffe082;">Unleavened Bread</span>
+      <span style="background: #fff59d;">First Fruits</span>
+      <span style="background: #ff7043;">Shavuot</span>
+      <span style="background: #81c784;">Yom Teruah</span>
+      <span style="background: #ef9a9a;">Yom Kippur</span>
+      <span style="background: #ce93d8;">Sukkot</span>
+    </div>
+  </div>
+
+  <script>
+    // Define the moedim (festivals) data
+    const moedimDates = {
+      1: { pesach: 14, unleavened: [15,17,18,19,20,21], firstFruits: 16 },  // Removed 16 from unleavened
+      3: { shavuot: 5 },
+      7: {
+        yomTeruah: 1,
+        yomKippur: [9,10],
+        sukkot: [15,16,17,18,19,20,21],
+        sukkot8th: 22
+      }
+    };
+
+    // Starting point of the calendar (March 19, 2025)
+    const startDate = new Date('March 19, 2025');
+
+    // Get the current time (local)
+    const now = new Date();
+
+    // Calculate 6 AM today (local time)
+    const sixAMToday = new Date(now);
+    sixAMToday.setHours(6, 0, 0, 0); // Set time to 6:00 AM today
+
+    // Calculate the number of days passed since the start date
+    const timeDifference = now - startDate;
+    let daysPassed = Math.floor(timeDifference / (1000 * 3600 * 24));
+
+    // If it's before 6 AM today, subtract 1 day
+    if (now < sixAMToday) {
+      daysPassed -= 1;
+    }
+
+    // Calculate the current month and day in month
+    const currentMonth = Math.floor(daysPassed / 28) + 1;  // Calculate month (1-based)
+    const currentDayInMonth = (daysPassed % 28) + 1;  // Get the current day in the month (1-based)
+
+    // Function to generate the calendar
+    function generateCalendar() {
+      const daysInMonth = 28;  // Hardcoded to 28 days per month
+      let calendarHTML = `<h2>Month ${currentMonth}</h2>`;
+      calendarHTML += `<table border="1">`;
+      calendarHTML += `<tr><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th><th>Sun</th><th>Mon</th><th>Tue</th></tr>`;
+
+      let day = 1;
+      for (let i = 0; i < 4; i++) {
+        calendarHTML += `<tr>`;
+        for (let j = 0; j < 7; j++) {
+          if(day <= daysInMonth) {
+            let className = "";
+
+            // Handle moedim (festivals) and First Fruits
+            if(moedimDates[currentMonth]) {
+              if(moedimDates[currentMonth].pesach === day) className = "pesach";
+              else if(moedimDates[currentMonth].unleavened?.includes(day)) className = "unleavened"; // Unleavened days excluding 16th
+              else if(moedimDates[currentMonth].firstFruits === day) className = "firstFruits"; // Explicitly mark First Fruits
+              else if(moedimDates[currentMonth].shavuot === day) className = "shavuot";
+              else if(moedimDates[currentMonth].yomTeruah === day) className = "yomteruah";
+              else if(moedimDates[currentMonth].yomKippur?.includes(day)) className = "yomkippur";  
+              else if(moedimDates[currentMonth].sukkot?.includes(day)) className = "sukkot";
+              else if(moedimDates[currentMonth].sukkot8th === day) className = "sukkot8th";
+            }
+
+            // Check for Shabbat (Saturday) - Saturday is index 3
+            if(j === 3) className += (className ? " " : "") + "shabbat"; 
+
+            // Then check if the current day matches this day, and if so, override everything
+            if(day === currentDayInMonth) {
+              className = "current-day";  // Set the class to current-day to override any other classes
+            }
+
+            // Add the day to the calendar
+            calendarHTML += `<td class="${className.trim()}">${day}</td>`;
+            day++;
+          }
+        }
+        calendarHTML += `</tr>`;
+      }
+      calendarHTML += `</table>`;
+
+      // Render the calendar HTML to the DOM
+      document.getElementById("calendar").innerHTML = calendarHTML;
+    }
+
+    // Call the function to generate the calendar
+    generateCalendar();
+  </script>
+</body>
+</html>
