@@ -31,9 +31,10 @@
 
     #calendar table {
       width: 100%;
-      table-layout: fixed;
+      table-layout: fixed; /* keep columns equal */
       border-collapse: collapse;
       margin: 0 auto;
+      max-width: 600px; /* limit width for large screens */
     }
 
     th {
@@ -50,6 +51,7 @@
       text-align: center;
       border: 1px solid #ccc;
       height: 40px;
+      word-wrap: break-word;
     }
 
     .current-day {
@@ -104,9 +106,20 @@
 
     /* Responsive adjustments */
     @media (max-width: 600px) {
+      #calendar-wrapper {
+        padding: 10px;
+        max-width: 100%;
+      }
+
+      #calendar table {
+        max-width: 100%;
+        width: 100%;
+      }
+
       th, td {
-        padding: 8px;
-        font-size: 12px;
+        padding: 10px;
+        font-size: 14px;
+        height: 35px;
       }
 
       #legend-wrapper {
@@ -117,6 +130,25 @@
       #legend-wrapper span {
         font-size: 12px;
         padding: 4px 8px;
+      }
+    }
+
+    /* Portrait mode tweaks to reduce skew but keep layout */
+    @media (max-width: 600px) and (orientation: portrait) {
+      #calendar-wrapper {
+        padding: 5px 10px;
+      }
+
+      #calendar table {
+        max-width: 100%;
+        width: 100%;
+        table-layout: fixed; /* important: keep fixed */
+      }
+
+      th, td {
+        padding: 8px 6px;
+        font-size: 13px;
+        height: 30px;
       }
     }
   </style>
@@ -142,8 +174,8 @@
 
   <script>
     const moedimDates = {
-      1: { pesach: 14, unleavened: [15,16,17,18,20,21], firstFruits: 19 },  // firstFruits updated to 19
-      3: { shavuot: 12 },  // shavuot updated to 12
+      1: { pesach: 14, unleavened: [15,16,17,18,20,21], firstFruits: 19 },
+      3: { shavuot: 12 },
       7: {
         yomTeruah: 1,
         yomKippur: [9,10],
