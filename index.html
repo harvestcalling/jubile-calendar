@@ -192,8 +192,8 @@
     let daysPassed = Math.floor((now - startDate) / (1000 * 3600 * 24));
     if (now < sixAMToday) daysPassed -= 1;
 
-    const currentMonth = Math.floor(daysPassed / 28) + 1;
     const currentDayInMonth = (daysPassed % 28) + 1;
+    const currentMonth = ((Math.floor(daysPassed / 28)) % 13) + 1;
 
     function generateCalendar() {
       const daysInMonth = 28;
